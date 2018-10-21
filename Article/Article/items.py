@@ -48,6 +48,6 @@ class JobboleArticleItem(scrapy.Item):
     fav_nums = scrapy.Field(input_processor=MapCompose(get_nums))
     comment_nums = scrapy.Field(input_processor=MapCompose(get_nums))
     content = scrapy.Field()
-    tags = scrapy.Field(output_processor=Join(","))
+    tags = scrapy.Field(input_processor=MapCompose(remove_comment), output_processor=Join(","))
 
 
