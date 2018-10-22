@@ -72,7 +72,8 @@ ITEM_PIPELINES = {
     # 'scrapy.pipelines.images.ArticleImagePipeline' : 1,
     # 'Article.pipelines.JsonWithEncodingPipeline' : 2,
     # 'Article.pipelines.JsonExporterPipeline' : 3,
-    'Article.pipelines.MysqlPipeline' : 4,
+    # 'Article.pipelines.CustomMysqlPipeline' : 4,
+    'Article.pipelines.DjangoMysqlPipeline': 5,
 }
 
 IMAGES_URLS_FIELD = "front_image"
@@ -100,9 +101,9 @@ IMAGES_STORE = os.path.join(project_dir, "images")
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-MYSQL_HOST = "localhost"
+MYSQL_HOST = "193.112.150.18"
 MYSQL_DBNAME = "scrapy_test"
-MYSQL_USER = "root"
-MYSQL_PASSWORD = "123456"
+MYSQL_USER = "ouru"
+MYSQL_PASSWORD = "5201314Ouru..."
 MYSQL_PORT = 3306
 MYSQL_CHARSET = "utf8"

@@ -10,8 +10,9 @@ import json
 
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exporters import JsonItemExporter
-from Article.utils.mysqlV1 import MysqlManager
 
+from Article.utils.mysqlV1 import MysqlManager
+from repository.models import JobboleArticle
 
 class ArticlePipeline(object):
     def process_item(self, item, spider):
@@ -56,7 +57,7 @@ class ArticleImagePipeline(ImagesPipeline):
             return item
 
 
-class MysqlPipeline:
+class CustomMysqlPipeline:
     def __init__(self, dbManager):
         self.dbManager = dbManager
 
@@ -81,6 +82,20 @@ class MysqlPipeline:
                               praise_nums=item["praise_nums"],
                               comment_nums=item["comment_nums"], fav_nums=item["fav_nums"],
                               tags=item["tags"])
-        pass
         return item
 
+
+class DjangoMysqlPipeline:
+    def process_item(self, item, spider):
+        images = ",".join(item["front_image_url"])
+        jobble_article = JobboleArticle()
+        jobble_article.title = item["title"]
+        jobble_article.create_date = item["create_date"]
+        jobble_article.url = item["url"]
+        jobble_article.url_object_id = item["url_object_id"]
+        jobble_article.front_image_url= images
+        jobble_article.praise_nums = item["praise_nums"]
+        jobble_article.comment_nums=item["comment_nums"]
+        jobble_article.fav_nums=item["fav_nums"]
+        jobble_article.tags=item["tags"]
+        jobble_article.save()
