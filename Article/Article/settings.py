@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import os
+import os, sys
+import django
+
+DATA_REPO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_repo")
+sys.path.append(DATA_REPO_DIR)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'data_repo.settings'
+django.setup()
+
 
 # Scrapy settings for Article project
 #
@@ -35,7 +42,7 @@ ROBOTSTXT_OBEY = False
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-#COOKIES_ENABLED = False
+COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -73,7 +80,7 @@ ITEM_PIPELINES = {
     # 'Article.pipelines.JsonWithEncodingPipeline' : 2,
     # 'Article.pipelines.JsonExporterPipeline' : 3,
     # 'Article.pipelines.CustomMysqlPipeline' : 4,
-    'Article.pipelines.DjangoMysqlPipeline': 5,
+    # 'Article.pipelines.DjangoMysqlPipeline': 5,
 }
 
 IMAGES_URLS_FIELD = "front_image"
