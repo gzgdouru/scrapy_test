@@ -99,3 +99,8 @@ class DjangoMysqlPipeline:
         jobble_article.fav_nums=item["fav_nums"]
         jobble_article.tags=item["tags"]
         jobble_article.save()
+
+
+class SaveMysqlPipeline:
+    def process_item(self, item, spider):
+        item.save_for_mysql()

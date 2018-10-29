@@ -81,6 +81,7 @@ ITEM_PIPELINES = {
     # 'Article.pipelines.JsonExporterPipeline' : 3,
     # 'Article.pipelines.CustomMysqlPipeline' : 4,
     # 'Article.pipelines.DjangoMysqlPipeline': 5,
+   'Article.pipelines.SaveMysqlPipeline' : 6,
 }
 
 IMAGES_URLS_FIELD = "front_image"

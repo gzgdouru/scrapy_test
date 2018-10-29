@@ -52,9 +52,10 @@ class ZhihuSpider(scrapy.Spider):
         item_loader.add_value("crawl_update_time", datetime.now())
         question_item = item_loader.load_item()
 
+        yield question_item
+
         yield Request(url=self.answer_start_url.format(question_id, 5, 0), dont_filter=True, headers=self.headers,
                       callback=self.parse_answer)
-        yield question_item
 
     def parse_answer(self, response):
         answer_json = json.loads(response.text)
