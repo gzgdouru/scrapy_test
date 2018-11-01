@@ -63,3 +63,31 @@ class ZhihuAnswer(models.Model):
 
     def __str__(self):
         return "{0}/{1}".format(self.question, self.zhihu_id)
+
+
+class LagouJob(models.Model):
+    obj_id = models.CharField(max_length=64, verbose_name="url的md5", primary_key=True)
+    url = models.URLField(max_length=255, verbose_name="url")
+    title = models.CharField(max_length=255, verbose_name="标题")
+    salary_min = models.PositiveIntegerField(verbose_name="最低薪资", default=0)
+    salary_max = models.PositiveIntegerField(verbose_name="最高薪资", default=0)
+    job_city = models.CharField(max_length=16, verbose_name="工作城市", null=True, blank=True)
+    work_years_min = models.PositiveIntegerField(verbose_name="最低工作年限", default=0)
+    work_years_max = models.PositiveIntegerField(verbose_name="最高工作年限", default=0)
+    degree_need = models.CharField(max_length=32, verbose_name="学历", null=True, blank=True)
+    job_type = models.CharField(max_length=32, verbose_name="工作类型", null=True, blank=True)
+    publish_time = models.DateTimeField(verbose_name="发布时间")
+    tags = models.CharField(max_length=255, verbose_name="标签", null=True, blank=True)
+    job_advantage = models.CharField(max_length=1024, verbose_name="职位诱惑", null=True, blank=True)
+    job_desc = models.TextField(verbose_name="职位描述")
+    job_addr = models.CharField(max_length=64, verbose_name="工作地点", null=True, blank=True)
+    company_url = models.URLField(max_length=255, verbose_name="公司链接", null=True, blank=True)
+    ccompany_name = models.CharField(max_length=255, verbose_name="公司名称", null=True, blank=True)
+    add_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
+    update_time = models.DateTimeField(verbose_name="更新时间", auto_now=True)
+
+    class Meta:
+        db_table = 'tb_lagou_job'
+
+    def __str__(self):
+        return self.title
