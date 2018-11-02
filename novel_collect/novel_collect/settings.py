@@ -76,6 +76,7 @@ ITEM_PIPELINES = {
    'novel_collect.pipelines.NovelCollectPipeline': 300,
     'novel_collect.pipelines.DownloadImagePipeline': 1,
     'novel_collect.pipelines.SaveMysqlPipeline': 2,
+    'novel_collect.pipelines.WriteFilePipeline': 3,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -103,3 +104,6 @@ IMAGES_URLS_FIELD = "image"
 IMAGES_STORE = os.path.join(BASE_DIR, "images")
 if not os.path.exists(IMAGES_STORE):
     os.makedirs(IMAGES_STORE)
+
+
+NOVELS_DIR = os.path.join(BASE_DIR, "novels")

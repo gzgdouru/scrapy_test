@@ -59,3 +59,19 @@ class Novel(models.Model):
 
     def __str__(self):
         return self.novel_name
+
+
+class Chapter(models.Model):
+    obj_id = models.CharField(max_length=64, verbose_name="url的MD5", primary_key=True)
+    novel = models.ForeignKey('Novel', models.CASCADE, verbose_name="小说")
+    url = models.URLField(unique=True, max_length=255, verbose_name="章节链接")
+    index = models.PositiveIntegerField(verbose_name="章节顺序", default=0)
+    name = models.CharField(max_length=255, verbose_name="章节名称")
+    add_time = models.DateTimeField(auto_now_add=True, verbose_name="添加时间")
+    update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        db_table = "tb_chapter"
+
+    def __str__(self):
+        return self.name

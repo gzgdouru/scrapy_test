@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 from urllib import parse
+import hashlib
 
 import scrapy
 from scrapy.loader import ItemLoader
 
-from novel_collect.items import NovelInfoItem
+from novel_collect.items import NovelInfoItem, ChapterInfoItem
 
+def get_md5(url):
+    if isinstance(url, str):
+        url = url.encode("utf-8")
+    m = hashlib.md5()
+    m.update(url)
+    return m.hexdigest()
 
 class BiqugeSpider(scrapy.Spider):
     name = 'biquge'
@@ -25,15 +32,18 @@ class BiqugeSpider(scrapy.Spider):
         novelinfo_item = item_loader.load_item()
         yield novelinfo_item
 
-        # urls = response.css("#list dd a::attr(href)").extract()
-        # urls = [parse.urljoin(response.url, url) for url in urls]
-        # for url in urls:
-        #     yield scrapy.Request(url=url, dont_filter=True, callback=self.parse_chapter)
+        urls = response.css("#list dd a::attr(href)").extract()
+        urls = [parse.urljoin(response.url, url) for url in urls]
+        for url in urls:
+            yield scrapy.Request(url=url, dont_filter=True, callback=self.parse_chapter)
 
     def parse_chapter(self, response):
-        site_name = response.xpath("//div[@id='box_con']/div[@class='con_top']/a[1]/text()").extract()
-        novel_name = response.xpath("//*[@id='box_con']/div[1]/a[2]/text()").extract()
-        title = response.css(".bookname h1::text").extract()
-        content = response.css("#content")
-        print(site_name, novel_name, title)
+        item_loader = ItemLoader(item=ChapterInfoItem(), response=response)
+        item_loader.add_value("obj_id", get_md5(response.url))
+        item_loader.add_value("url", response.url)
+        item_loader.add_css("name", ".bookname h1::text")
+        item_loader.add_css("content", "#content")
+        item_loader.add_xpath("novel_name", "//div[@class='con_top']/a[2]/text()")
+        chapterinfo_item = item_loader.load_item()
+        yield chapterinfo_item
 

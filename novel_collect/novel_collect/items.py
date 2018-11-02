@@ -6,12 +6,12 @@
 # https://doc.scrapy.org/en/latest/topics/items.html
 
 from urllib import parse
-import re
+import re, os
 
 import scrapy
 from scrapy.loader.processors import TakeFirst, Identity, MapCompose
 
-from repository.models import NovelCategory, Author, Novel
+from repository.models import NovelCategory, Author, Novel, Chapter
 
 
 def parse_novel_category(value):
@@ -28,6 +28,14 @@ def parse_novel_author(value):
         return match_obj.group(1)
     else:
         return ""
+
+
+def get_chapter_index(url):
+    match_obj = re.match(r'.*?(\d+).html', url)
+    if match_obj:
+        return int(match_obj.group(1))
+    else:
+        return 0
 
 
 class NovelCollectItem(scrapy.Item):
@@ -73,3 +81,37 @@ class NovelInfoItem(scrapy.Item):
             novel.intro = self["intro"]
             novel.parser = self["parser"]
             novel.save()
+
+
+class ChapterInfoItem(scrapy.Item):
+    obj_id = scrapy.Field(output_processor=TakeFirst())
+    url = scrapy.Field(output_processor=TakeFirst())
+    name = scrapy.Field(output_processor=TakeFirst())
+    content = scrapy.Field(output_processor=TakeFirst())
+    novel_name = scrapy.Field(output_processor=TakeFirst())
+
+    def save_for_mysql(self):
+        if not Chapter.objects.filter(pk=self["obj_id"]).exists():
+            chapter_obj = Chapter()
+            chapter_obj.obj_id = self["obj_id"]
+            chapter_obj.url = self["url"]
+            chapter_obj.index = get_chapter_index(self["url"])
+            chapter_obj.name = self["name"]
+
+            novel = Novel.objects.get(novel_name=self["novel_name"])
+            chapter_obj.novel = novel
+
+            chapter_obj.save()
+
+    def write_file(self):
+        from novel_collect.settings import NOVELS_DIR
+        novel = Novel.objects.get(novel_name=self["novel_name"])
+
+        full_path = os.path.join(NOVELS_DIR, str(novel.id))
+        if not os.path.exists(full_path):
+            os.makedirs(full_path)
+
+        file = os.path.join(full_path, "{0}.txt".format(get_chapter_index(self["url"])))
+        if not os.path.exists(file):
+            with open(file, "w", encoding="utf-8") as f:
+                f.write(self["content"])

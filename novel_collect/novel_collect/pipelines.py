@@ -8,12 +8,19 @@ from urllib import parse
 
 from scrapy.pipelines.images import ImagesPipeline
 
+from novel_collect.items import NovelInfoItem
+
 class NovelCollectPipeline(object):
     def process_item(self, item, spider):
         return item
 
 
 class DownloadImagePipeline(ImagesPipeline):
+    def process_item(self, item, spider):
+        if isinstance(item, NovelInfoItem):
+            return super(DownloadImagePipeline, self).process_item(item, spider)
+        return item
+
     def get_media_requests(self, item, info):
         item["image"] = [parse.urljoin(item["url"], image) for image in item["image"]]
         return super(DownloadImagePipeline, self).get_media_requests(item, info)
@@ -29,5 +36,13 @@ class DownloadImagePipeline(ImagesPipeline):
 
 class SaveMysqlPipeline:
     def process_item(self, item, spider):
-        item.save_for_mysql()
+        if hasattr(item, "save_for_mysql"):
+            item.save_for_mysql()
+        return item
+
+
+class WriteFilePipeline:
+    def process_item(self, item, spider):
+        if hasattr(item, "write_file"):
+            item.write_file()
         return item

@@ -82,7 +82,7 @@ class LagouJob(models.Model):
     job_desc = models.TextField(verbose_name="职位描述")
     job_addr = models.CharField(max_length=64, verbose_name="工作地点", null=True, blank=True)
     company_url = models.URLField(max_length=255, verbose_name="公司链接", null=True, blank=True)
-    ccompany_name = models.CharField(max_length=255, verbose_name="公司名称", null=True, blank=True)
+    company_name = models.CharField(max_length=255, verbose_name="公司名称", null=True, blank=True)
     add_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
     update_time = models.DateTimeField(verbose_name="更新时间", auto_now=True)
 
