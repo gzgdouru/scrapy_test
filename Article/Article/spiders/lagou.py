@@ -31,7 +31,7 @@ class LagouSpider(CrawlSpider):
     rules = (
         Rule(LinkExtractor(allow=r'zhaopin.*'), follow=True),
         Rule(LinkExtractor(allow=r'gongsi.*'), follow=True),
-        Rule(LinkExtractor(allow=r'jobs/\d+.html'), callback='parse_job', follow=True),
+        Rule(LinkExtractor(allow=r'jobs/\d+.html.*'), callback='parse_job', follow=True),
     )
 
     def parse_start_url(self, response):
