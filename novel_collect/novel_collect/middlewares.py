@@ -56,6 +56,23 @@ class NovelCollectSpiderMiddleware(object):
         spider.logger.info('Spider opened: %s' % spider.name)
 
 
+class ProxyIpMiddleware(object):
+    def __init__(self):
+        super(ProxyIpMiddleware, self).__init__()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls()
+
+    def process_request(self, request, spider):
+        proxy = self.get_proxy()
+        request.meta["proxy"] = proxy
+
+    def get_proxy(self):
+        proxy = "http://120.237.14.198:53281"
+        return proxy
+
+
 class NovelCollectDownloaderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the downloader middleware does not modify the

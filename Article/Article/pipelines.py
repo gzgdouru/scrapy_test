@@ -103,4 +103,5 @@ class DjangoMysqlPipeline:
 
 class SaveMysqlPipeline:
     def process_item(self, item, spider):
-        item.save_for_mysql()
+        if hasattr(item, "save_for_mysql"):
+            item.save_for_mysql()

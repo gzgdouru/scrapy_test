@@ -6,6 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from fake_useragent import UserAgent
+
+from Article.utils.mysqlV1 import MysqlManager
 
 
 class ArticleSpiderMiddleware(object):
@@ -54,6 +57,44 @@ class ArticleSpiderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class RandomUserAgentMiddleware(object):
+    def __init__(self, ua_type):
+        super(RandomUserAgentMiddleware, self).__init__()
+        self.ua = UserAgent()
+        self.ua_type = ua_type
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        ua_type = crawler.settings.get("USER_AGNET_TYPE", "random")
+        return cls(ua_type)
+
+    def process_request(self, request, spider):
+        if hasattr(self.ua, self.ua_type):
+            user_agent = getattr(self.ua, self.ua_type)
+        else:
+            user_agent = self.ua.random
+        request.headers.setdefault("User-Agent", user_agent)
+
+
+class ProxyIpMiddleware(object):
+    def __init__(self):
+        super(ProxyIpMiddleware, self).__init__()
+        self.mysqldb = MysqlManager(host="193.112.150.18", user="ouru", passwd="5201314Ouru...", db="novel")
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls()
+
+    def process_request(self, request, spider):
+        proxy = self.get_proxy()
+        request.meta["proxy"] = proxy
+
+    def get_proxy(self):
+        record = list(self.mysqldb.execute("select * from proxys order by rand() limit 1"))[0]
+        proxy = "http://{0}:{1}".format(record.ip, record.port)
+        return proxy
 
 
 class ArticleDownloaderMiddleware(object):
