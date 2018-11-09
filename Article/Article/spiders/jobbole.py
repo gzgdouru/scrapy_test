@@ -6,6 +6,11 @@ import re
 from datetime import datetime
 
 from scrapy.loader import ItemLoader
+from selenium import webdriver
+from scrapy import signals
+from scrapy.xlib.pydispatch import dispatcher
+from scrapy.exceptions import IgnoreRequest
+
 
 from Article.items import JobboleArticleItem, JobboleItemLoader
 from Article.utils.common import get_md5
@@ -13,10 +18,39 @@ from Article.utils.common import get_md5
 class JobboleSpider(scrapy.Spider):
     name = 'jobbole'
     allowed_domains = ['http://blog.jobbole.com/']
-    start_urls = ['http://blog.jobbole.com/all-posts/']
+    start_urls = ['http://blog.jobbole.com/all-posts/ouru/']
+
+    custom_settings = {
+        "COOKIES_ENABLED" : False,
+        "ITEM_PIPELINES" : {},
+        "AUTOTHROTTLE_ENABLED" : True,
+        "AUTOTHROTTLE_START_DELAY" : 3,
+        "DOWNLOADER_MIDDLEWARES" : {
+            # 'Article.middlewares.DynamicPageMiddleware': 1,
+        },
+        "SPIDER_MIDDLEWARES" : {
+            # 'Article.middlewares.CustomSpiderMiddleware': 1
+        }
+    }
+
+    handle_httpstatus_list = [404]
+
+    def __init__(self):
+        # self.browser = webdriver.Chrome(executable_path="chromedriver")
+        dispatcher.connect(self.spider_close, signal=signals.spider_closed)
+        self.fail_urls = []
+        pass
+
+    def spider_close(self):
+        self.crawler.stats.set_value("{0}/fail_urls".format(self.name), self.fail_urls)
+        # self.browser.quit()
 
     def parse(self, response):
         #提取当前页的所有文章链接
+        if response.status == 404:
+            self.fail_urls.append(response.url)
+            self.crawler.stats.inc_value("{0}/fail_url_num".format(self.name))
+
         postNodes = response.css("#archive .post-thumb a")
         for postNode in postNodes:
             frontImage = postNode.css("img::attr(src)").extract_first("")

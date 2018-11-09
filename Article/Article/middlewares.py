@@ -4,9 +4,12 @@
 #
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
+import time
+import logging
 
 from scrapy import signals
 from fake_useragent import UserAgent
+from scrapy.http import HtmlResponse
 
 from Article.utils.mysqlV1 import MysqlManager
 
@@ -59,6 +62,22 @@ class ArticleSpiderMiddleware(object):
         spider.logger.info('Spider opened: %s' % spider.name)
 
 
+class CustomSpiderMiddleware(object):
+    def __init__(self):
+        super(CustomSpiderMiddleware, self).__init__()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls()
+
+    def process_spider_input(self, response, spider):
+        raise RuntimeError("测试异常")
+
+    def process_spider_exception(self, response, exception, spider):
+        logger = logging.getLogger(__name__)
+        logger.info("{0} error: {1}".format(spider.name, exception))
+
+
 class RandomUserAgentMiddleware(object):
     def __init__(self, ua_type):
         super(RandomUserAgentMiddleware, self).__init__()
@@ -95,6 +114,21 @@ class ProxyIpMiddleware(object):
         record = list(self.mysqldb.execute("select * from proxys order by rand() limit 1"))[0]
         proxy = "http://{0}:{1}".format(record.ip, record.port)
         return proxy
+
+
+class DynamicPageMiddleware(object):
+    def __init__(self):
+        super(DynamicPageMiddleware, self).__init__()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls()
+
+    def process_request(self, request, spider):
+        spider.browser.get(request.url)
+        time.sleep(2)
+        text = spider.browser.page_source
+        return HtmlResponse(url=request.url, body=text, request=request, encoding="utf-8")
 
 
 class ArticleDownloaderMiddleware(object):

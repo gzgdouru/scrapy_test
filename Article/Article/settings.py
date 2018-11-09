@@ -66,7 +66,7 @@ USER_AGNET_TYPE = "random"
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    # 'Article.middlewares.ArticleDownloaderMiddleware': 543,
-   'Article.middlewares.RandomUserAgentMiddleware': 1,
+   # 'Article.middlewares.RandomUserAgentMiddleware': 1,
 }
 
 # Enable or disable extensions
@@ -85,7 +85,7 @@ ITEM_PIPELINES = {
     # 'Article.pipelines.JsonExporterPipeline' : 3,
     # 'Article.pipelines.CustomMysqlPipeline' : 4,
     # 'Article.pipelines.DjangoMysqlPipeline': 5,
-   'Article.pipelines.SaveMysqlPipeline' : 6,
+   # 'Article.pipelines.SaveMysqlPipeline' : 6,
 }
 
 IMAGES_URLS_FIELD = "front_image"
